@@ -66,9 +66,9 @@ namespace demo_map_server.Services
                 case "transform":
                     // The provided resource is the input to the transformation process (will be in `resource` here)
 
-                    // We need to inject the "map" into the parameters for the other operation
+                    // We need to inject the "map" (or "source") into the parameters for the other operation
                     var resource = await Get(id, null, SummaryType.False);
-                    operationParameters.Add("map", resource);
+                    operationParameters.Add("source", resource);
                     return await PerformOperation_Transform(operationParameters, summary);
             }
             return await base.PerformOperation(id, operation, operationParameters, summary);
@@ -78,14 +78,14 @@ namespace demo_map_server.Services
         {
             var outcome = new OperationOutcome();
             Resource resource = operationParameters["resource"]?.Resource ?? operationParameters["content"]?.Resource;
-            StructureMap sm = operationParameters["map"]?.Resource as StructureMap;
-            if (operationParameters["map"]?.Value is FhirString mapString)
+            StructureMap sm = operationParameters["source"]?.Resource as StructureMap;
+            if (operationParameters["source"]?.Value is FhirString mapString)
             {
                 // This is a workaround to support passing the raw map as a string as a resource parameter
                 try
                 {
                     var parser = new StructureMapUtilitiesParse();
-                    sm = parser.parse(mapString.Value, "map");
+                    sm = parser.parse(mapString.Value, "source");
                 }
                 catch (Exception ex)
                 {
@@ -244,7 +244,7 @@ namespace demo_map_server.Services
                     // (including the map that was used to evaluate the request - in StructureMap format)
                     var configParams = new Parameters.ParameterComponent() { Name = "parameters" };
                     configParams.Part.Add(new Parameters.ParameterComponent() { Name = "evaluator", Value = new FhirString(".NET (brianpos) 4.3.0 alpha-7") });
-                    configParams.Part.Add(new Parameters.ParameterComponent() { Name = "map", Resource = sm });
+                    configParams.Part.Add(new Parameters.ParameterComponent() { Name = "source", Resource = sm });
                     result.Parameter.Add(configParams);
 
                     // The Trace/debug processing messages

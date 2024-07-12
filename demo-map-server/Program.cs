@@ -17,7 +17,7 @@ namespace demo_map_server
             FhirPathCompiler.DefaultSymbolTable.AddFhirExtensions();
 
             var appFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            appFolder = Path.Combine(appFolder, "demo-map-server", "data");
+            appFolder = Path.Combine(appFolder, "demo-map-server-app", "data");
             DirectorySystemService<System.IServiceProvider>.Directory = appFolder;
             // DirectorySystemService<System.IServiceProvider>.Directory = @"c:\temp\demo-map-server";
             if (!System.IO.Directory.Exists(DirectorySystemService<System.IServiceProvider>.Directory))
@@ -57,6 +57,7 @@ namespace demo_map_server
 
             var app = builder.Build();
             app.UseCors();
+            app.UsePathBase("/fhir");
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
